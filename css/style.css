@@ -21,6 +21,10 @@ textarea.form-control {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+.label {
+  font-weight: bold;
+}
+
 .mb-1 {
   margin-bottom: 0.5rem;
 }
