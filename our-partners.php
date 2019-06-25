@@ -21,6 +21,8 @@ class Partners
 
     // Represents the nonce value used to save the post media
     private $nonce = 'wp_partners_nonce';
+    private $singular_label = "Partner";
+    private $plural_label = "Partners";
 
     /* --------------------------------------------
      * Constructor
@@ -37,9 +39,9 @@ class Partners
 
         // Setup the meta box hooks
         add_action('init', array($this, 'create_cpt'));
-        add_action('add_meta_boxes', array( $this, 'add_meta_box' ));
         add_action('save_post', array( $this, 'save_partners_meta' ));
         add_action('admin_enqueue_scripts', array($this, 'load_wp_media_files'));
+        $this->add_meta_box();
     } // end construct
 
     public function load_wp_media_files()
@@ -122,75 +124,39 @@ class Partners
 
     public function add_meta_box()
     {
-        add_meta_box(
-      "partner-meta-box",
-      "Partner Info",
-      array($this, "display_partners_meta"),
-      "partners",
-      "advanced",
-      "high",
-      null
-    );
+        add_action('cmb2_admin_init', array($this, 'register_metabox'));
     }
 
-    public function save_partners_meta($post_id)
-    {
-        // First, make sure the user can save the post
-        if ($this->user_can_save($post_id, $this->nonce)) {
-            $this->save_partners($post_id);
-        } // end if
-    }
-
-    public function display_partners_meta()
-    {
-        global $post;
-        wp_nonce_field(plugin_basename(__FILE__), $this->nonce);
-
-        $values = get_post_custom($post->ID);
-        $partner = isset($values['partner']) ? json_decode($values['partner'][0]) : null; ?>
-    <div class="js-form-group form-group">
-      <div class="label mb-1">Partner Logo</div>
-      <div class="js-img-wrap mb-2">
-        <?php if (isset($partner)): ?>
-          <img src="<?php echo $partner->logo_url; ?>" alt=""/>
-        <?php endif; ?>
-      </div>
-      <div class="input-group">
-        <input id="partner_logo_url" type="hidden" class="form-control" name="partner[logo_url]" value="<?php echo isset($partner) ? $partner->logo_url : ""; ?>">
-        <div class="input-group-append">
-          <button type="button" data-media-uploader-target="#partner_logo_url" class="btn btn-default js-add-icon">Add Logo</button>
-        </div>
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="label mb-1">Partner Link</div>
-      <input type="text" name="partner[link]" class="form-control" value="<?php echo isset($partner) ? $partner->link : ""; ?>">
-    </div>
-
-    <?php
-    }
-
-    public function save_partners($post_id)
-    {
-        if (isset($_POST['partner'])) {
-            update_post_meta($post_id, "partner", json_encode($_POST['partner']));
-        }
-    }
     /**
-       * Determines whether or not the current user has the ability to save meta data associated with this post.
-       *
-       * @param		int		$post_id	The ID of the post being save
-       * @param		bool				Whether or not the user has the ability to save this post.
-       */
-    public function user_can_save($post_id, $nonce)
+     * Hook in and add a metabox that only appears on the 'About' page
+     */
+    public function register_metabox()
     {
-        $is_autosave = wp_is_post_autosave($post_id);
-        $is_revision = wp_is_post_revision($post_id);
-        $is_valid_nonce = (isset($_POST[ $nonce ]) && wp_verify_nonce($_POST[ $nonce ], plugin_basename(__FILE__)));
+        $prefix = strtolower($this->singular_label).'_';
 
-        // Return true if the user is able to save; otherwise, false.
-        return ! ($is_autosave || $is_revision) && $is_valid_nonce;
-    } // end user_can_save
+        $cmb_portfolio_page = new_cmb2_box([
+         'id'           => $prefix . 'metabox',
+         'title'        => esc_html__($this->singular_label.' Info', 'cmb2'),
+         'object_types' => array( strtolower($this->plural_label) ), // Post type
+         'context'      => 'normal',
+         'priority'     => 'default',
+         'show_names'   => true, // Show field names on the left
+        ]);
+
+
+      $cmb_portfolio_page->add_field( array(
+      	'name' => 'Partner Logo',
+      	'desc' => '',
+      	'id'   => $prefix.'logo',
+      	'type' => 'file',
+      ) );
+      $cmb_portfolio_page->add_field( array(
+      	'name' => 'Partner URL',
+      	'id'   => $prefix.'url',
+      	'type' => 'text',
+      ) );
+    }
+
 } // end class
 
 $GLOBALS['partners'] = new Partners();
