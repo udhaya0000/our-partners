@@ -112,7 +112,7 @@ class Partners {
     add_meta_box(
       "partner-meta-box",
       "Partner Info",
-      array($this, "display_partner_meta"),
+      array($this, "display_partners_meta"),
       "partners",
       "advanced",
       "high",
