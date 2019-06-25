@@ -164,7 +164,7 @@ class Partners
     </div>
     <div class="form-group">
       <div class="label mb-1">Partner Link</div>
-      <input type="text" name="partner[link]" class="form-control" value="<?php echo isset($partner) ? $partner->text : ""; ?>">
+      <input type="text" name="partner[link]" class="form-control" value="<?php echo isset($partner) ? $partner->link : ""; ?>">
     </div>
 
     <?php
