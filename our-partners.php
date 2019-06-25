@@ -39,7 +39,6 @@ class Partners
 
         // Setup the meta box hooks
         add_action('init', array($this, 'create_cpt'));
-        add_action('save_post', array( $this, 'save_partners_meta' ));
         add_action('admin_enqueue_scripts', array($this, 'load_wp_media_files'));
         $this->add_meta_box();
     } // end construct
