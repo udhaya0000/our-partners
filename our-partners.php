@@ -40,7 +40,8 @@ class Partners {
 	 } // end construct
 
 	 public function register_admin_scripts() {
-		 wp_enqueue_style( 'partners-meta-style', plugins_url( 'css/style.css', __FILE__ ), array(''), OP_VERSION);
+
+		 wp_enqueue_style( 'partners-meta-style', plugins_url( 'css/style.css', __FILE__ ), array(), OP_VERSION);
 
      wp_enqueue_script( 'partners-meta-js', plugins_url( 'js/index.js', __FILE__ ), array('jquery'), OP_VERSION);
      wp_enqueue_script( 'partners-js', plugins_url( 'js/partners.js', __FILE__ ), array('jquery'), OP_VERSION);
